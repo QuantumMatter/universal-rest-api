@@ -34,7 +34,7 @@ function POST() {
     mysqli_query($m_db, $query);
     
     $JSON .= '{"Message":"'.$db->error.'"}';
-    printLast();
+    printLastUser();
 }
 
 function GET() {
@@ -55,7 +55,6 @@ function GET() {
     }
     if (($userOK == true) && ($uid != -1)) {
         $c_query = "SELECT ID FROM connections WHERE `key`='".$key."'";
-        printMessage("QUERY", $c_query);
         $c_result = mysqli_query($m_db, $c_query);
         while ($c_row = mysqli_fetch_row($c_result)) {
             $c_id = $c_row[0];
@@ -71,9 +70,8 @@ function passToken($u_id, $c_id) {
     $token = random_key();
     
     $query = "INSERT INTO tokens (`userid`, `address`, `token`, `connectionid`) VALUES ('".$u_id."', '".$address."', '".$token."', '".$c_id."');";
-    printMessage("QUERY", $query);
     mysqli_query($m_db, $query);
-    
+    printLastToken();
 }
 
 function random_key() {
@@ -94,8 +92,13 @@ function DELETE() {
     mysqli_query($m_db, $query);
 }
 
-function printLast() {
+function printLastUser() {
     $query = "SELECT * FROM users ORDER BY ID DESC LIMIT 1";
+    printResults($query);
+}
+
+function printLastToken() {
+    $query = "SELECT * FROM tokens ORDER BY ID DESC LIMIT 1";
     printResults($query);
 }
 

@@ -11,6 +11,8 @@ if (!$m_db) {
     echo "Could not connect";
 }
 
+$JSON = "[";
+
 $verb = $_SERVER['REQUEST_METHOD'];
 if (strcmp($verb, "POST") == 0) {
     POST();
@@ -20,7 +22,9 @@ if (strcmp($verb, "POST") == 0) {
 
 function POST() {
     global $m_db;
-    
+    global $JSON;
+
+
     $u_id = $_POST['uid'];
     $server = $_POST['server'];
     $database = $_POST['database'];
@@ -29,8 +33,31 @@ function POST() {
     $key = random_key();
     
     $query = "INSERT INTO connections(`userid`, `server`, `database`, `username`, `password`, `key`) VALUES ('".$u_id."', '".$server."', '".$database."', '".$username."', '".$password."', '".$key."');";
-    echo $query;
+    
     mysqli_query($m_db, $query);
+    printLast();
+}
+
+function printLast() {
+    $query = "SELECT * FROM connections ORDER BY ID DESC LIMIT 1";
+    printResults($query);
+}
+
+function printResults($query) {
+    global $m_db;
+    global $JSON;
+    
+    $result = mysqli_query($m_db, $query);
+    $fields = $result->fetch_fields();
+    while ($row = mysqli_fetch_row($result)) {
+        $JSON .= '{';
+        for ($i = 0; $i < count($row); ++$i) {
+            $JSON .= '"'.$fields[$i]->name.'":"'.$row[$i].'",';
+        }
+        $JSON = substr($JSON, 0, -1);
+        $JSON .= '},';
+    }
+    $JSON = substr($JSON, 0, -1);
 }
 
 function DELETE() {
@@ -47,3 +74,7 @@ function random_key() {
     }
     return $random;
 }
+
+$JSON .= "]";
+
+echo $JSON;

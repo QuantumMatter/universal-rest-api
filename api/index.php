@@ -146,6 +146,9 @@ function PUT() {
     //echo $query." ";
     printMessage("QUERY", $query);
     mysqli_query($u_db, $query);
+    
+    $new_q = "SELECT * FROM ".$table." WHERE `ID`='".$post_vars['ID']."'";
+    printResults($new_q);
 }
 
 function DELETE() {
